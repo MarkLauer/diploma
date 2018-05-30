@@ -29,7 +29,7 @@ def logout():
 @bp.route('/is_logged')
 def is_logged():
     if current_user.is_authenticated:
-        return jsonify(status=True, email=current_user.email)
+        return jsonify(status=True, id=current_user.id, email=current_user.email)
     return jsonify(status=False)
 
 

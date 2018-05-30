@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from diploma.models import Conference, Person, Organization
 from diploma import db
 from diploma.marshmallow_schemas import ConferenceSchema
+from datetime import datetime
 
 bp = Blueprint('conferences', __name__, url_prefix='/conferences')
 
@@ -32,9 +33,9 @@ def assign_fields(conference, data):
     if 'place' in data:
         conference.place = data['place']
     if 'start_date' in data:
-        conference.start_date = data['start_date']
+        conference.start_date = datetime.strptime(data['start_date'], '%d.%m.%Y')
     if 'end_date' in data:
-        conference.end_date = data['end_date']
+        conference.end_date = datetime.strptime(data['end_date'], '%d.%m.%Y')
     if 'logo' in data:
         conference.logo = data['logo']
     if 'purposes' in data:
@@ -110,6 +111,8 @@ def update():
     conference = Conference.query.get(data['id'])
     if conference is None:
         return jsonify(status=False, error='not found')
+    if 'short_name' in data and Conference.query.filter_by(short_name=data['short_name']).first() is not None:
+        return jsonify(status=False, error='short name already in database')
     assign_fields(conference, data)
     db.session.commit()
     return jsonify(status=True)

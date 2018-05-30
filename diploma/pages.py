@@ -37,6 +37,10 @@ def assing_fields(page, data):
 @bp.route('/create', methods=('POST',))
 def create():
     data = request.get_json(force=True)
+    if 'name' not in data:    
+        return jsonify(status=False, error='no name')
+    if Page.query.filter_by(name=data['name']).first() is not None:
+        return jsonify(status=False, error='name already in database')
     page = Page()
     assing_fields(page, data)
     db.session.add(page)
