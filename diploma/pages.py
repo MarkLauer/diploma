@@ -31,13 +31,14 @@ def assing_fields(page, data):
         page.text = data['content']
     if 'conference_id' in data:
         conference = Conference.query.get(data['conference_id'])
-        page.conference = conference
+        if conference is not None:
+            page.conference = conference
 
 
 @bp.route('/create', methods=('POST',))
 def create():
     data = request.get_json(force=True)
-    if 'name' not in data:    
+    if 'name' not in data:
         return jsonify(status=False, error='no name')
     if Page.query.filter_by(name=data['name']).first() is not None:
         return jsonify(status=False, error='name already in database')
